@@ -681,17 +681,17 @@ public class Service extends BaseService {
 		while(retry>0) {
 			try {
 				account.deleteByHeaderValue(HEADER_X_WEBTOP_MSGID,""+msgId);
-				if (retry<3) logger.error("Retry deleting automatic draft succeded");
+				if (retry<3) logger.debug("Retry deleting automatic draft succeded");
 				break;
 			} catch(Throwable t) {
-				logger.error("Error deleting automatic draft",t);
+				logger.debug("Error deleting automatic draft",t);
 			}
 			if (--retry >0) {
-				logger.error("Retrying delete of automatic draft after exception");
+				logger.debug("Retrying delete of automatic draft after exception");
 				try { Thread.sleep(1000); } catch(InterruptedException exc) {}
 			}
 		}
-		if (retry==0) logger.error("Delete of automatic draft failed");
+		if (retry==0) logger.error("Delete of automatic draft failed, msgId: " + msgId + ", mail account username: " + account.getUsername());
 	}
 	
 	private MailAccount getAccount(Identity ident) {
@@ -752,7 +752,7 @@ public class Service extends BaseService {
 			msg.addHeaderLine(HEADER_X_WEBTOP_MSGID+": "+msgId);
 			Exception exc = saveMessage(msg, null, fc);
 		} catch(Exception exc) {
-			logger.error("Error on autosave in drafts!",exc);
+			logger.debug("Error on autosave in drafts!",exc);
 		}
 	}	
 	
@@ -993,7 +993,7 @@ public class Service extends BaseService {
 			msg = createMessage(from, smsg, attachments, false);
 			Transport.send(msg);
 		} catch (Exception ex) {
-			Service.logger.error("Exception",ex);
+			Service.logger.debug("Exception",ex);
 			retexc = ex;
 		}
 
@@ -4705,7 +4705,7 @@ public class Service extends BaseService {
                 json=new JsonResult(false, msgstr);
 			}
 		} catch (Exception exc) {
-			Service.logger.error("Exception",exc);
+			Service.logger.debug("Exception",exc);
 			Throwable cause = exc.getCause();
 			String msg = cause != null ? cause.getMessage() : exc.getMessage();
             json=new JsonResult(false, msg);
@@ -4813,7 +4813,7 @@ public class Service extends BaseService {
                 json=new JsonResult(false, exc.getMessage());
 			}
 		} catch (Exception exc) {
-			Service.logger.error("Exception",exc);
+			Service.logger.debug("Exception",exc);
             json=new JsonResult(false, exc.getMessage());
 		}
         json.printTo(out);
@@ -5020,7 +5020,7 @@ public class Service extends BaseService {
 					//InternetAddress.parse(email.replace(',', ' '), false);
 					getInternetAddress(email);
 				} catch (AddressException exc) {
-					Service.logger.error("Exception",exc);
+					Service.logger.debug("Exception",exc);
 					throw new AddressException(lookupResource(MailLocaleKey.ADDRESS_ERROR) + " : " + email);
 				}
 			}
